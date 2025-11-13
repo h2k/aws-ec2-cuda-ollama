@@ -6,7 +6,7 @@ This guide outlines the steps to set up an Ollama API service on an AWS EC2 inst
 
 - Go to EC2 dashboard and click "Launch instance"
 - Name your instance (e.g., "Ollama-GPU-Server")
-- AMI: Search for and select "Deep Learning Base OSS Nvidia Driver GPU AMI (Ubuntu 22.04)"
+- AMI: Search for and select <b>"Deep Learning OSS Nvidia Driver AMI GPU PyTorch 2.8 (Ubuntu 24.04)"</b> or  "Deep Learning Base OSS Nvidia Driver GPU AMI (Ubuntu 22.04)"
 - Instance type: <b style="font-size:20px">g4ad.xlarge</b> or g4dn.xlarge (4 vCPUs, 16 GiB Memory, 1 GPU)
 - Create or select a key pair for SSH access
 - Network settings: Create a security group with the following rules:
