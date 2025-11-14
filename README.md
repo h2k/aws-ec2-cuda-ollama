@@ -56,6 +56,10 @@ ollama serve
 
 ```
 ollama pull gemma2:2b
+or
+ollama run yasserrmd/ALLaM-7B-Instruct-preview
+or 
+ollama run yasserrmd/Fanar-1-9B-Instruct
 ```
 
 ## 9. Run Go Application
