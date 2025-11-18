@@ -16,7 +16,7 @@ const (
 )
 
 func main() {
-	http.HandleFunc("/v1/", handleProxy)
+	http.HandleFunc("/", handleProxy)
 	fmt.Println("Server is running on 0.0.0.0:8080")
 	log.Fatal(http.ListenAndServe("0.0.0.0:8080", nil))
 }
