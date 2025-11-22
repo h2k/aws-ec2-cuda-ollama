@@ -2,31 +2,40 @@ import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq
 
-def convert_csv_to_parquet(input_path, output_path, separator = "¦",  chunksize= 500_000 , compression="snappy"):
-    
-    # adjust chunksize based on RAM
-    try:
-        parquet_writer = None
-        for chunk in pd.read_csv(input_path, sep=separator, chunksize=chunksize):
-            table = pa.Table.from_pandas(chunk)
+input_path = "bigfile.csv"
+output_path = "bigfile.parquet"
 
-            if parquet_writer is None:
-                parquet_writer = pq.ParquetWriter(
-                    output_path,
-                    table.schema,
-                    compression=compression
-                )
-            parquet_writer.write_table(table)
+chunksize = 500_000  # adjust based on RAM
 
-        if parquet_writer:
-            parquet_writer.close()
+parquet_writer = None
 
-        return {"status":1 , "Msg": f"Finished writing {output_path} parquet!", "output_path": output_path}
-    except Exception as e:
-        return {"status":-1 , "Msg": f"Error during conversion: {e}"}
-    
-if __name__ == "__main__":
-    input_path = "sample_5gb.csv"
-    output_path = "bigfile.parquet"
-    status = convert_csv_to_parquet(input_path, output_path, chunksize= 500_000 )
-    print(status)
+for chunk in pd.read_csv(
+    input_path,
+    sep="¦",
+    dtype=str,          # ✅ force pandas to read everything as string
+    keep_default_na=False  # ✅ prevents NaN becoming float or missing
+):
+    # Convert pandas → pyarrow, force string columns
+    table = pa.Table.from_pandas(
+        chunk,
+        preserve_index=False,  # ✅ avoids unnecessary index column
+        schema=None            # we will infer only for 1st chunk
+    )
+
+    if parquet_writer is None:
+        # ✅ Build a string-only schema for Parquet
+        string_schema = pa.schema(
+            [(name, pa.string()) for name in table.column_names]
+        )
+        parquet_writer = pq.ParquetWriter(
+            output_path,
+            string_schema,
+            compression="snappy"
+        )
+
+    parquet_writer.write_table(table)
+
+if parquet_writer:
+    parquet_writer.close()
+
+print("✅ Finished writing Parquet with all columns as STRING!")
